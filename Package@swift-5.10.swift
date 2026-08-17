@@ -1,24 +1,41 @@
 // swift-tools-version: 5.10
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "Validator",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v13),
-        .watchOS(.v9),
-        .tvOS(.v16),
+        // Raised to match skip-fuse-ui, which requires iOS 17 / macOS 14 / tvOS 17 / watchOS 10.
+        // A lower floor here makes SwiftPM reject the dependency during resolution.
+        .iOS(.v17),
+        .macOS(.v14),
+        .watchOS(.v10),
+        .tvOS(.v17),
         .visionOS(.v1),
     ],
     products: [
-        .library(name: "ValidatorCore", targets: ["ValidatorCore"]),
-        .library(name: "ValidatorUI", targets: ["ValidatorUI"]),
+        .library(name: "ValidatorCore", type: .dynamic, targets: ["ValidatorCore"]),
+        .library(name: "ValidatorUI", type: .dynamic, targets: ["ValidatorUI"]),
+    ],
+    dependencies: [
+        .package(url: "https://source.skip.tools/skip.git", from: "1.9.4"),
+        .package(url: "https://source.skip.tools/skip-fuse.git", from: "1.0.0"),
+        .package(url: "https://source.skip.tools/skip-fuse-ui.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "ValidatorCore", dependencies: []),
-        .target(name: "ValidatorUI", dependencies: ["ValidatorCore"]),
+        .target(
+            name: "ValidatorCore",
+            dependencies: [.product(name: "SkipFuse", package: "skip-fuse")],
+            plugins: [.plugin(name: "skipstone", package: "skip")]
+        ),
+        .target(
+            name: "ValidatorUI",
+            dependencies: [
+                "ValidatorCore",
+                .product(name: "SkipFuseUI", package: "skip-fuse-ui"),
+            ],
+            plugins: [.plugin(name: "skipstone", package: "skip")]
+        ),
         .testTarget(name: "ValidatorCoreTests", dependencies: ["ValidatorCore"]),
         .testTarget(name: "ValidatorUITests", dependencies: ["ValidatorCore", "ValidatorUI"]),
     ]
