@@ -1,34 +1,43 @@
-![A powerful, type-safe validation framework for Swift](https://raw.githubusercontent.com/space-code/validator/main/Resources/validator.png)
+![A powerful, type-safe validation framework for Swift](https://raw.githubusercontent.com/Clockworks-Solutions/validator/main/Resources/validator.png)
 
 <h1 align="center" style="margin-top: 0px;">validator</h1>
 
 <p align="center">
-<a href="https://github.com/space-code/validator/blob/main/LICENSE"><img alt="Licence" src="https://img.shields.io/cocoapods/l/service-core.svg?style=flat"></a> 
-<a href="https://swiftpackageindex.com/space-code/validator"><img alt="Swift Compatibility" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fspace-code%2Fvalidator%2Fbadge%3Ftype%3Dswift-versions"/></a> 
-<a href="https://swiftpackageindex.com/space-code/validator"><img alt="Platform Compatibility" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fspace-code%2Fvalidator%2Fbadge%3Ftype%3Dplatforms"/></a> 
-<a href="https://github.com/space-code/validator/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/space-code/validator/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/Clockworks-Solutions/validator/blob/main/LICENSE"><img alt="Licence" src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat"></a>
+<a href="https://swift.org"><img alt="Swift Compatibility" src="https://img.shields.io/badge/Swift-6.1-orange.svg?style=flat"></a>
+<img alt="Platform Compatibility" src="https://img.shields.io/badge/platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS%20%7C%20Android-lightgrey.svg?style=flat">
 <a href="https://github.com/apple/swift-package-manager" alt="Validator on Swift Package Manager" title="Validator on Swift Package Manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg" /></a>
-<a href="https://codecov.io/gh/space-code/validator" >  <img src="https://codecov.io/gh/space-code/validator/graph/badge.svg?token=3B8FE96372"/>  </a>
+<a href="https://skip.tools"><img alt="Skip" src="https://img.shields.io/badge/Skip-compatible-8A2BE2.svg?style=flat"></a>
 </p>
 
+> **This is a fork.**
+> Upstream: [space-code/validator](https://github.com/space-code/validator), created and maintained by Nikita Vasilev.
+> This fork is maintained by [Clockworks Solutions](https://github.com/Clockworks-Solutions/validator) and extends the
+> original with support for [Skip](https://skip.tools), so the same validation code runs on Apple platforms **and** on
+> Android. Issues, discussions and pull requests for this fork belong
+> [here](https://github.com/Clockworks-Solutions/validator) — please do not file fork-specific reports upstream.
+
 ## Description
-Validator is a modern, lightweight Swift framework that provides elegant and type-safe input validation. Built with Swift's powerful type system, it seamlessly integrates with both UIKit and SwiftUI, making form validation effortless across all Apple platforms.
+
+Validator is a modern, lightweight Swift framework that provides elegant and type-safe input validation. Built with Swift's powerful type system, it integrates with SwiftUI, UIKit and AppKit, making form validation effortless across Apple platforms — and, through Skip, on Android from the very same Swift source.
 
 ## Features
 
 ✨ **Type-Safe Validation** - Leverages Swift's type system for compile-time safety  
 🎯 **Rich Rule Set** - Built-in validators for common use cases  
 🔧 **Extensible** - Easy to create custom validation rules  
-📱 **UIKit Integration** - First-class support for UITextField and other UIKit components  
+🤖 **Android via Skip** - `ValidatorCore` and the SwiftUI layer compile natively for Android  
 🎨 **SwiftUI Native** - Property wrappers and view modifiers for declarative validation  
+👀 **Observation-Based** - Form state is driven by `@Observable`, not Combine, so it works on every platform  
+📱 **UIKit & AppKit Integration** - First-class support for `UITextField`, `UITextView` and `NSTextField` (Apple only)  
 📋 **Form Management** - Validate multiple fields with centralized state management  
-⚡ **Lightweight** - Minimal footprint with zero dependencies  
 🧪 **Well Tested** - Comprehensive test coverage  
 
 ## Table of Contents
 
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Skip Integration](#skip-integration)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
   - [Core Validation](#core-validation)
@@ -46,19 +55,22 @@ Validator is a modern, lightweight Swift framework that provides elegant and typ
 
 ## Requirements
 
-| Platform  | Minimum Version |
-|-----------|----------------|
-| iOS       | 16.0+          |
-| macOS     | 13.0+          |
-| tvOS      | 16.0+          |
-| watchOS   | 9.0+           |
-| visionOS  | 1.0+           |
-| Xcode     | 15.3+          |
-| Swift     | 5.10+          |
+| Platform  | Minimum Version    |
+|-----------|--------------------|
+| iOS       | 17.0+              |
+| macOS     | 14.0+              |
+| tvOS      | 17.0+              |
+| watchOS   | 10.0+              |
+| visionOS  | 1.0+               |
+| Android   | API 28+ (via Skip) |
+| Xcode     | 16.3+              |
+| Swift     | 6.1+               |
 
-## Usage
+The floor is higher than upstream for two reasons: the form-validation stack is built on `Observation`, and the
+package depends on `skip-fuse-ui`, which itself requires iOS 17 / macOS 14.
 
-The package contains two libraries: `ValidatorCore` encompasses all validation logic and predefined validators, while `ValidatorUI` implements extensions for integrating the validator into UI objects. It supports both `SwiftUI` and `UIKit`.
+> **Note:** the [Skip](https://skip.tools) toolchain (`brew install skiptools/skip/skip`) is required to build this
+> package on every platform, not just for Android, because the `skipstone` plugin runs as part of the build.
 
 ## Installation
 
@@ -68,15 +80,46 @@ Add the following dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/space-code/validator.git", from: "1.5.0")
+    .package(url: "https://github.com/Clockworks-Solutions/validator.git", branch: "main")
 ]
 ```
 
 Or add it through Xcode:
 
 1. File > Add Package Dependencies
-2. Enter package URL: `https://github.com/space-code/validator.git`
+2. Enter package URL: `https://github.com/Clockworks-Solutions/validator.git`
 3. Select version requirements
+
+The package pulls in `skip`, `skip-fuse` and `skip-fuse-ui` transitively; in a Skip app these are the same
+dependencies your app already resolves.
+
+## Skip Integration
+
+[Skip](https://skip.tools) compiles Swift for Android. This fork is a Skip **Fuse** package: the Swift sources are
+compiled natively for Android, and the `skipstone` plugin generates the Kotlin bridge so the SwiftUI layer renders
+through Jetpack Compose.
+
+What that means in practice:
+
+- **`ValidatorCore` is fully portable.** Every rule works identically on Apple platforms and Android.
+- **The SwiftUI layer is portable.** `import SkipFuseUI` re-exports real SwiftUI on Apple platforms and Skip's
+  SwiftUI implementation on Android, so the library has a single code path.
+- **Form state uses `Observation`.** `Combine` does not exist in the Android Swift SDK; `@Observable` does, and Skip
+  bridges its property reads and writes into Compose's snapshot system.
+- **UIKit and AppKit helpers are Apple-only.** They attach state to `UITextField`/`NSTextField` through the
+  Objective-C runtime, which has no Android equivalent. They are compiled out there; use the SwiftUI API instead.
+
+Nothing extra is required in your app — add the package to a Skip target and build:
+
+```swift
+.target(
+    name: "MyFeature",
+    dependencies: [
+        .product(name: "ValidatorUI", package: "validator"),
+    ],
+    plugins: [.plugin(name: "skipstone", package: "skip")]
+)
+```
 
 ## Quick Start
 
@@ -104,12 +147,12 @@ case .invalid(let errors):
 
 The framework provides two main libraries:
 
-- **ValidatorCore** - Core validation logic and predefined validators
-- **ValidatorUI** - UI integration for UIKit and SwiftUI
+- **ValidatorCore** - Core validation logic and predefined validators. Runs everywhere, including Android.
+- **ValidatorUI** - UI integration. The SwiftUI layer runs everywhere; the UIKit/AppKit layer is Apple-only.
 
 ### Core Validation
 
-Validate any input with the `Validator` class:
+Validate any input with the `Validator` type:
 
 ```swift
 import ValidatorCore
@@ -126,37 +169,29 @@ let result = validator.validate(
 
 ### UIKit Integration
 
-Import `ValidatorUI` to add validation to UIKit components:
+Import `ValidatorUI` to add validation to UIKit components. This API is available on Apple platforms only —
+on Android, use the SwiftUI API below.
 
 ```swift
 import UIKit
-import ValidatorUI
 import ValidatorCore
+import ValidatorUI
 
-class ViewController: UIViewController {
-    let emailField = UITextField()
-    
+final class LoginViewController: UIViewController {
+    private let emailField = UITextField()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Add validation rules
-        emailField.add(
-            rule: RegexValidationRule(
-                pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
-                error: "Please enter a valid email"
-            )
-        )
-        
-        // Enable real-time validation
+
         emailField.validateOnInputChange(isEnabled: true)
-        
-        // Handle validation results
+        emailField.add(rule: EmailValidationRule(error: "Please enter a valid email"))
+
         emailField.validationHandler = { result in
             switch result {
             case .valid:
-                self.updateUI(isValid: true)
-            case .invalid(let errors):
-                self.showErrors(errors)
+                print("✅ Valid input")
+            case let .invalid(errors):
+                print("❌ \(errors.map(\.message).joined(separator: ", "))")
             }
         }
     }
@@ -167,16 +202,16 @@ class ViewController: UIViewController {
 
 #### Single Field Validation
 
-Use the `.validation()` modifier for simple field validation:
+Use the `.validation()` modifier to observe the result of validating a bound value:
 
 ```swift
 import SwiftUI
-import ValidatorUI
 import ValidatorCore
+import ValidatorUI
 
 struct LoginView: View {
-    @State private var email = ""
-    
+    @State var email = ""
+
     var body: some View {
         TextField("Email", text: $email)
             .validation($email, rules: [
@@ -193,68 +228,67 @@ struct LoginView: View {
 }
 ```
 
-Or use `.validate()` with a custom error view:
+Or use `.validate()` to render a custom error view directly beneath the field. The result is derived from the bound
+value as the body is evaluated, so the errors shown are always in sync with what the user typed:
 
 ```swift
 struct LoginView: View {
-    @State private var password = ""
-    
+    @State var password = ""
+
     var body: some View {
-        VStack(alignment: .leading) {
-            SecureField("Password", text: $password)
-                .validate(item: $password, rules: [
-                    LengthValidationRule(min: 8, error: "Too short")
-                ]) { errors in
-                    ForEach(errors, id: \.message) { error in
-                        Text(error.message)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
+        SecureField("Password", text: $password)
+            .validate(item: $password, rules: [
+                LengthValidationRule(min: 8, error: "Too short")
+            ]) { errors in
+                ForEach(errors, id: \.message) { error in
+                    Text(error.message)
+                        .foregroundColor(.red)
+                        .font(.caption)
                 }
-        }
+            }
     }
 }
 ```
 
 ### Form Validation
 
-Manage multiple fields with `FormFieldManager`:
+Manage multiple fields with `FormFieldManager`. Each `@FormField` owns a validation container that re-validates its
+value — after an optional debounce interval — and publishes the outcome as observable state:
 
 ```swift
-import Combine
 import SwiftUI
-import ValidatorUI
 import ValidatorCore
+import ValidatorUI
 
-class RegistrationForm: ObservableObject {
-    @Published var manager = FormFieldManager()
-    
+@MainActor
+final class RegistrationForm {
+    let manager = FormFieldManager()
+
     @FormField(rules: [
         LengthValidationRule(min: 2, max: 50, error: "Invalid name length")
     ])
     var firstName = ""
-    
+
     @FormField(rules: [
         LengthValidationRule(min: 2, max: 50, error: "Invalid name length")
     ])
     var lastName = ""
-    
+
     @FormField(rules: [
         RegexValidationRule(
             pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
             error: "Invalid email"
         )
-    ])
+    ], debounce: 0.3)
     var email = ""
-    
+
     lazy var firstNameContainer = _firstName.validate(manager: manager)
     lazy var lastNameContainer = _lastName.validate(manager: manager)
     lazy var emailContainer = _email.validate(manager: manager)
 }
 
 struct RegistrationView: View {
-    @StateObject private var form = RegistrationForm()
-    @State private var isFormValid = false
+    @State var form = RegistrationForm()
 
     var body: some View {
         Form {
@@ -263,37 +297,44 @@ struct RegistrationView: View {
                     .validate(validationContainer: form.firstNameContainer) { errors in
                         ErrorView(errors: errors)
                     }
-                
+
                 TextField("Last Name", text: $form.lastName)
                     .validate(validationContainer: form.lastNameContainer) { errors in
                         ErrorView(errors: errors)
                     }
             }
-            
+
             Section("Contact") {
                 TextField("Email", text: $form.email)
                     .validate(validationContainer: form.emailContainer) { errors in
                         ErrorView(errors: errors)
                     }
             }
-            
+
             Section {
-                Button("Submit") {
-                    form.manager.validate()
-                }
-                .disabled(!isFormValid)
+                Button("Submit") { submitForm() }
+                    .disabled(!form.manager.isValid)
             }
         }
-        .onReceive(form.manager.$isValid) { newValue in
-            isFormValid = newValue
-        }
     }
-    
+
     private func submitForm() {
+        form.manager.validate()
         print("✅ Form is valid, submitting...")
     }
 }
 ```
+
+`FormFieldManager.isValid` is observable, so reading it in a view body is all that is needed to keep a submit button
+enabled or disabled. Call `manager.validate()` to force a re-check of every registered field.
+
+Two things to note when writing this in a Skip target:
+
+- Do **not** mark the form class `@Observable`. `@FormField` is a property wrapper, and the `@Observable` macro
+  collides with the storage it synthesises. The validation containers and `FormFieldManager` are already observable,
+  which is what refreshes the UI.
+- Declare `@State` properties as internal (`@State var`), not `private`. Skip's bridge generator rejects private
+  state with *"Private state property cannot be bridged to Android"*.
 
 ## Built-in Validators
 
@@ -308,19 +349,21 @@ struct RegistrationView: View {
 | `CreditCardValidationRule` | Validates credit card numbers (Luhn algorithm) | `CreditCardValidationRule(error: "Invalid card number")` |
 | `EmailValidationRule` | Validates email format | `EmailValidationRule(error: "Please enter a valid email")` |
 | `CharactersValidationRule` | Validates that a string contains only characters from the allowed CharacterSet | `CharactersValidationRule(characterSet: .letters, error: "Invalid characters")` |
-| `NilValidationRule` | Validates that value is nil | `NilValidationRule(error: "Value must be nil")`
-| `PositiveNumberValidationRule` | Validates that value is positive | `PositiveNumberValidationRule(error: "Value must be positive")`
-| `NoWhitespaceValidationRule` | Validates that a string does not contain any whitespace characters | `NoWhitespaceValidationRule(error: "Spaces are not allowed")`
-| `ContainsValidationRule` | Validates that a string contains a specific substring | `ContainsValidationRule(substring: "@", error: "Must contain @")`
-| `EqualityValidationRule`| Validates that the input is equal to a given reference value | `EqualityValidationRule(compareTo: password, error: "Passwords do not match")`
-| `ComparisonValidationRule` | Validates that input against a comparison constraint | `ComparisonValidationRule(greaterThan: 0, error: "Must be greater than 0")`
-| `IBANValidationRule` | Validates that a string is a valid IBAN (International Bank Account Number) | `IBANValidationRule(error: "Invalid IBAN")`
-| `IPAddressValidationRule` | Validates that a string is a valid IPv4 or IPv6 address | `IPAddressValidationRule(version: .v4, error: ValidationError("Invalid IPv4"))`
-| `PostalCodeValidationRule` | Validates postal/ZIP codes for different countries | `PostalCodeValidationRule(country: .uk, error: "Invalid post code")`
-| `Base64ValidationRule` | Validates that a string represents valid Base64-encoded data. | `Base64ValidationRule(error: "The input is not valid Base64.")`
+| `NilValidationRule` | Validates that value is nil | `NilValidationRule(error: "Value must be nil")` |
+| `PositiveNumberValidationRule` | Validates that value is positive | `PositiveNumberValidationRule(error: "Value must be positive")` |
+| `NoWhitespaceValidationRule` | Validates that a string does not contain any whitespace characters | `NoWhitespaceValidationRule(error: "Spaces are not allowed")` |
+| `ContainsValidationRule` | Validates that a string contains a specific substring | `ContainsValidationRule(substring: "@", error: "Must contain @")` |
+| `EqualityValidationRule`| Validates that the input is equal to a given reference value | `EqualityValidationRule(compareTo: password, error: "Passwords do not match")` |
+| `ComparisonValidationRule` | Validates that input against a comparison constraint | `ComparisonValidationRule(greaterThan: 0, error: "Must be greater than 0")` |
+| `IBANValidationRule` | Validates that a string is a valid IBAN (International Bank Account Number) | `IBANValidationRule(error: "Invalid IBAN")` |
+| `IPAddressValidationRule` | Validates that a string is a valid IPv4 or IPv6 address | `IPAddressValidationRule(version: .v4, error: "Invalid IPv4")` |
+| `PostalCodeValidationRule` | Validates postal/ZIP codes for different countries | `PostalCodeValidationRule(country: .uk, error: "Invalid post code")` |
+| `Base64ValidationRule` | Validates that a string represents valid Base64-encoded data | `Base64ValidationRule(error: "The input is not valid Base64.")` |
 | `UUIDValidationRule` | Validates UUID format | `UUIDValidationRule(error: "Please enter a valid UUID")` |
-| `JSONValidationRule` | Validates that a string represents valid JSON | `JSONValidationRule(error: "Invalid JSON")`
- 
+| `JSONValidationRule` | Validates that a string represents valid JSON | `JSONValidationRule(error: "Invalid JSON")` |
+
+Every rule in this table is available on Android as well as on Apple platforms.
+
 ## Custom Validators
 
 Create custom validation rules by conforming to `IValidationRule`:
@@ -330,15 +373,15 @@ import ValidatorCore
 
 struct EmailDomainValidationRule: IValidationRule {
     typealias Input = String
-    
+
     let allowedDomains: [String]
     let error: IValidationError
-    
+
     init(allowedDomains: [String], error: IValidationError) {
         self.allowedDomains = allowedDomains
         self.error = error
     }
-    
+
     func validate(input: String) -> Bool {
         guard let domain = input.split(separator: "@").last else {
             return false
@@ -353,6 +396,9 @@ let rule = EmailDomainValidationRule(
     error: "Only company email addresses are allowed"
 )
 ```
+
+Keep custom rules free of platform-specific API if you intend to run them on Android — plain Swift and Foundation
+are portable, while the Objective-C runtime and Combine are not.
 
 ### Composing Validators
 
@@ -386,47 +432,50 @@ let specialCharRule = RegexValidationRule(
     error: "Must contain special character"
 )
 
-// UIKit: Pass all rules to your text field
-passwordField.add(rules: [
+// SwiftUI: render every failed rule beneath the field
+SecureField("Password", text: $password)
+    .validate(item: $password, rules: [
+        lengthRule,
+        uppercaseRule,
+        lowercaseRule,
+        numberRule,
+        specialCharRule
+    ]) { errors in
+        ForEach(errors, id: \.message) { error in
+            Text(error.message)
+                .foregroundColor(.red)
+                .font(.caption)
+        }
+    }
+
+// UIKit (Apple platforms): pass the same rules to your text field
+passwordField.validate(rules: [
     lengthRule,
     uppercaseRule,
     lowercaseRule,
     numberRule,
     specialCharRule
 ])
-
-// SwiftUI: Use in validation modifier
-SecureField("Password", text: $password)
-    .validation($password, rules: [
-        lengthRule,
-        uppercaseRule,
-        lowercaseRule,
-        numberRule,
-        specialCharRule
-    ]) { result in
-        if case .invalid(let errors) = result {
-            self.passwordErrors = errors
-        }
-    }
 ```
 
 ## Examples
 
-You can find usage examples in the [Examples](./Examples/) directory of the repository.  
+You can find usage examples in the [Examples](./Examples/) directory of the repository.
 
-These examples demonstrate how to integrate the package, configure validation rules,  
+These examples demonstrate how to integrate the package, configure validation rules,
 and build real-world user interfaces using `ValidatorCore` and `ValidatorUI`.
 
 ## Communication
 
-- 🐛 **Found a bug?** [Open an issue](https://github.com/space-code/validator/issues/new?template=bug_report.md)
-- 💡 **Have a feature request?** [Open an issue](https://github.com/space-code/validator/issues/new?template=feature_request.md)
-- ❓ **Questions?** [Start a discussion](https://github.com/space-code/validator/discussions)
-- 🔒 **Security issue?** Email nv3212@gmail.com
+- 🐛 **Found a bug?** [Open an issue](https://github.com/Clockworks-Solutions/validator/issues/new)
+- 💡 **Have a feature request?** [Open an issue](https://github.com/Clockworks-Solutions/validator/issues/new)
+- ❓ **Questions?** [Start a discussion](https://github.com/Clockworks-Solutions/validator/discussions)
+- 🔒 **Security issue?** Email dhruv@clockworks.co.in
 
 ## Contributing
 
-We love contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes.
+Contributions are welcome. Please read our [Contributing Guide](CONTRIBUTING.md) to learn about the development
+process, how to propose bugfixes and improvements, and how to build and test your changes.
 
 ### Development Setup
 
@@ -436,26 +485,20 @@ Bootstrap the development environment:
 mise install
 ```
 
+Install the Skip toolchain, which the build requires on every platform:
+
+```bash
+brew install skiptools/skip/skip
+```
+
 ### Code of Conduct
 
 This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
-
-## Author
-
-**Nikita Vasilev**
-- Email: nv3212@gmail.com
-- GitHub: [@ns-vasilev](https://github.com/ns-vasilev)
 
 ## License
 
 Validator is released under the MIT license. See [LICENSE](LICENSE) for details.
 
----
+Original work © Nikita Vasilev ([space-code](https://github.com/space-code)); fork maintained by Clockworks Solutions.
 
-<div align="center">
 
-**[⬆ back to top](#validator)**
-
-Made with ❤️ by [space-code](https://github.com/space-code)
-
-</div>
