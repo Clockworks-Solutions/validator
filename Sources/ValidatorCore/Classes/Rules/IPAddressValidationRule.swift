@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import SkipFuse
 
 /// A validation rule for checking whether the input string is a valid IPv4 or IPv6 address.
 ///

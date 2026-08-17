@@ -3,40 +3,38 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import Combine
 import Foundation
 import ValidatorCore
-
-/// A convenience typealias for a Combine publisher that emits validation results.
-public typealias ValidationPublisher = AnyPublisher<ValidationResult, Never>
 
 // MARK: - FormField
 
 /// A property wrapper representing a single field in a form.
 ///
 /// Encapsulates a value, its validation rules, and the validator used for checking the value.
-/// Provides automatic integration with a form via `IFormField` protocol.
+/// Provides automatic integration with a form via the `IFormField` protocol.
+///
+/// # Example:
+/// ```swift
+/// @FormField(rules: [NonEmptyValidationRule(error: "Required")], debounce: 0.3)
+/// var email: String = ""
+/// ```
+@MainActor
 @propertyWrapper
 public final class FormField<Value>: IFormField {
     // MARK: Properties
 
-    /// The value stored in the field. Wrapped with `@Published` to observe changes.
-    @Published
-    private var value: Value
-
-    /// The validator used to apply rules to the value.
-    private let validator: IValidator
-
-    /// The rules applied to the value during validation.
-    private let rules: [any IValidationRule<Value>]
-
-    /// The time the publisher should wait before publishing an element.
-    private let debounce: TimeInterval
+    /// The container that stores the value and tracks its validation state.
+    public let container: FormValidationContainter<Value>
 
     /// The wrapped property value.
     public var wrappedValue: Value {
-        get { value }
-        set { value = newValue }
+        get { container.value }
+        set { container.value = newValue }
+    }
+
+    /// The validation container backing this field, so callers can read its validation result.
+    public var projectedValue: any IFormValidationContainer<Value> {
+        container
     }
 
     // MARK: Initialization
@@ -47,17 +45,19 @@ public final class FormField<Value>: IFormField {
     ///   - wrappedValue: The initial value of the field.
     ///   - validator: The validator instance to use (defaults to `Validator()`).
     ///   - rules: The array of validation rules to apply to the value.
-    ///   - debounce: The time the publisher should wait before publishing an element.
+    ///   - debounce: The time to wait after a change before the new value is validated.
     public init(
         wrappedValue: Value,
         validator: IValidator = Validator(),
         rules: [any IValidationRule<Value>],
         debounce: TimeInterval = .zero
     ) {
-        value = wrappedValue
-        self.validator = validator
-        self.rules = rules
-        self.debounce = debounce
+        container = FormValidationContainter(
+            value: wrappedValue,
+            validator: validator,
+            rules: rules,
+            debounce: debounce
+        )
     }
 
     // MARK: IFormField
@@ -66,27 +66,10 @@ public final class FormField<Value>: IFormField {
     ///
     /// - Parameter manager: The form field manager that tracks this field.
     ///
-    /// - Returns: A `IFormValidationContainer` which exposes a publisher of validation results.
-    public func validate(manager: some IFormFieldManager) -> any IFormValidationContainer {
-        let subject = CurrentValueSubject<Value, Never>(value)
-
-        let publisher = $value
-            .receive(on: RunLoop.main)
-            .dropFirst()
-            .debounce(for: RunLoop.SchedulerTimeType.Stride(debounce), scheduler: RunLoop.main)
-            .handleEvents(receiveOutput: { subject.send($0) })
-            .map { self.validator.validate(input: $0, rules: self.rules) }
-            .eraseToAnyPublisher()
-
-        let container = FormValidationContainter(
-            value: subject,
-            publisher: publisher,
-            validator: validator,
-            rules: rules
-        )
-
+    /// - Returns: A `IFormValidationContainer` which exposes the field's validation result.
+    @discardableResult
+    @inlinable @inline(always) public func validate(manager: some IFormFieldManager) -> any IFormValidationContainer {
         manager.append(validator: container)
-
         return container
     }
 }

@@ -3,6 +3,10 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
+// Apple platforms only: validation state is attached to UIKit/AppKit controls through the Objective-C
+// runtime, which Android has no equivalent for. Use the SwiftUI API there.
+#if canImport(ObjectiveC)
+
 import Foundation
 import ValidatorCore
 
@@ -147,3 +151,5 @@ public extension IUIValidatable {
         }
     }
 }
+
+#endif

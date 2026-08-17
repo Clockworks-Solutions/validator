@@ -34,7 +34,7 @@ public struct Base64ValidationRule: IValidationRule {
 
     // MARK: IValidationRule
 
-    public func validate(input: String) -> Bool {
+   @inlinable @inline(always) public func validate(input: String) -> Bool {
         guard !input.isEmpty else { return false }
 
         let cleanedInput = input.replacingOccurrences(of: "\\s", with: "", options: .regularExpression)
@@ -45,8 +45,8 @@ public struct Base64ValidationRule: IValidationRule {
 
         guard Data(base64Encoded: cleanedInput) != nil else { return false }
 
-        let base64Pattern = "^[A-Za-z0-9+/]*={0,2}$"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", base64Pattern)
-        return predicate.evaluate(with: cleanedInput)
+        // `NSPredicate(format:)` is unavailable in swift-corelibs-foundation, so this uses the `Regex`
+        let base64Pattern = #/^[A-Za-z0-9+/]*={0,2}$/#
+        return cleanedInput.wholeMatch(of: base64Pattern) != nil
     }
 }

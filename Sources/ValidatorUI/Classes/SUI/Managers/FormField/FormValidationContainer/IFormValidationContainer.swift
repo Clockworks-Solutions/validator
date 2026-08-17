@@ -3,30 +3,36 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import Combine
 import Foundation
+// SkipFuse must be imported for `@Observable` to bind to Skip's bridged `Observation.ObservationRegistrar`,
+// which forwards property reads and writes into Compose on Android.
+import Observation
+import SkipFuse
 import ValidatorCore
-
-/// A typealias for a `CurrentValueSubject` used to track form field values.
-///
-/// This subject publishes the current value of a form field and emits new values
-/// whenever the field is updated, enabling reactive validation in SwiftUI or other UI frameworks.
-public typealias FormValidatorValueSubject<Value> = CurrentValueSubject<Value, Never>
 
 // MARK: - IFormValidationContainer
 
 /// A container that encapsulates validation logic for a single form field.
 ///
-/// This protocol defines the core components required to perform field validation
-/// and publish validation results to observers such as UI elements or a form manager.
-public protocol IFormValidationContainer<Value> {
+/// The container owns the field's current value, re-validates whenever that value changes, and
+/// exposes the outcome through the observable `validationResult` property. A SwiftUI view that
+/// reads `validationResult` inside its `body` is refreshed automatically when it changes.
+///
+/// - Note: Built on `Observation` rather than `Combine`, which the Android Swift SDK does not ship,
+///         so Apple platforms and Android run the same code.
+@MainActor
+public protocol IFormValidationContainer<Value>: AnyObject, Observable {
     associatedtype Value
 
-    /// The subject that holds the current value of the form field and publishes changes.
-    var value: FormValidatorValueSubject<Value> { get }
+    /// The current value of the form field.
+    ///
+    /// Assigning a new value schedules re-validation, honouring the container's debounce interval.
+    var value: Value { get set }
 
-    /// A publisher that emits validation results whenever the field is updated.
-    var publisher: ValidationPublisher { get }
+    /// The most recent validation result.
+    ///
+    /// This property is observable: reading it from a SwiftUI `body` subscribes the view to updates.
+    var validationResult: ValidationResult { get }
 
     /// The validator used to evaluate the field's value against the provided rules.
     var validator: IValidator { get }

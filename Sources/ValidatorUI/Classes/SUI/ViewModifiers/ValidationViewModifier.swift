@@ -3,8 +3,12 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import SwiftUI
+// SkipFuseUI re-exports SwiftUI on Apple platforms and SkipSwiftUI on Android.
+import SkipFuseUI
 import ValidatorCore
+
+// swiftlint:disable:next prefixed_toplevel_constant
+private let validator = Validator()
 
 /// A  validation view modifier.
 ///
@@ -38,10 +42,6 @@ import ValidatorCore
 /// ```
 public struct ValidationViewModifier<T, ErrorView: View>: ViewModifier {
     // MARK: Properties
-
-    /// The current result of the validation.
-    /// Updated whenever the value changes or rules are applied.
-    @State private var validationResult: ValidationResult = .valid
 
     /// The value to validate, wrapped as a `Binding` so changes are observed automatically.
     @Binding private var item: T
@@ -78,19 +78,23 @@ public struct ValidationViewModifier<T, ErrorView: View>: ViewModifier {
     public func body(content: Content) -> some View {
         VStack(alignment: .leading) {
             content
-                .validation($item, rules: rules) { result in
-                    DispatchQueue.main.async {
-                        validationResult = result
-                    }
-                }
             validationMessageView
         }
     }
 
+
+    // Skip's bridge generator emits an unlabelled `value.body($0)` for generic `ViewModifier`s, which
+    // matches neither SwiftUI's nor SkipUI's `body(content:)`. This overload gives it a target.
+    public func body(_ content: Content) -> some View {
+        body(content: content)
+    }
+
     // MARK: Private
 
+    /// Derived from the bound value as the body is evaluated, so the rendered errors are a pure
+    /// function of the input and appear on the same frame on SwiftUI and on Compose.
     private var validationMessageView: some View {
-        switch validationResult {
+        switch validator.validate(input: item, rules: rules) {
         case .valid:
             EmptyView().eraseToAnyView()
         case let .invalid(errors):
