@@ -14,5 +14,5 @@ public enum ValidationResult {
     /// Indicates that validation failed.
     ///
     /// - Parameter errors: An array of `IValidationError` instances describing each failure.
-    case invalid(errors: [IValidationError])
+    case invalid(errors: [Error])
 }

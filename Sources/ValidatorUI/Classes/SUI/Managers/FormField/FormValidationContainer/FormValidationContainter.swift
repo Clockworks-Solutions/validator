@@ -3,48 +3,67 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import Combine
 import Foundation
+// SkipFuse must be imported for `@Observable` to bind to Skip's bridged `Observation.ObservationRegistrar`,
+// which forwards property reads and writes into Compose on Android.
+import Observation
+import SkipFuse
 import ValidatorCore
 
 /// A concrete implementation of `IFormValidationContainer` for a single form field.
 ///
-/// Wraps a value subject, a validator, and a set of validation rules, and exposes a
-/// publisher that emits validation results whenever the value changes.
-public struct FormValidationContainter<T>: IFormValidationContainer {
+/// Holds the field's value, its validator and its rules, and re-validates the value whenever it
+/// changes. Results are delivered through the observable `validationResult` property.
+///
+/// Value changes are coalesced by `debounce` seconds: each change cancels the pending validation
+/// and starts a new one, so only the last value in a burst of edits is validated.
+@MainActor
+@Observable
+public final class FormValidationContainter<Value>: IFormValidationContainer {
     // MARK: Properties
 
-    /// The value subject for the form field.
-    public var value: FormValidatorValueSubject<T>
+    /// The current value of the form field.
+    public var value: Value
 
-    /// The publisher that emits validation results.
-    public let publisher: ValidationPublisher
+    /// The most recent validation result.
+    ///
+    /// Starts out `.valid` and is updated once the value changes, so a freshly built form does not
+    /// show errors before the user has typed anything.
+    public private(set) var validationResult: ValidationResult = .valid
 
     /// The validator used to check the field's value against its rules.
-    public let validator: IValidator
+    @ObservationIgnored public let validator: IValidator
 
     /// The validation rules applied to the field.
-    public let rules: [any IValidationRule<T>]
+    @ObservationIgnored public let rules: [any IValidationRule<Value>]
+
+    /// The time to wait after a change before the new value is validated.
+    @ObservationIgnored public let debounce: TimeInterval
+
+    /// The in-flight debounced validation, cancelled whenever a newer value arrives.
+    @ObservationIgnored private var validationTask: Task<Void, Never>?
 
     // MARK: Initialization
 
     /// Creates a new form validation container.
     ///
     /// - Parameters:
-    ///   - value: The subject holding the field's value.
-    ///   - publisher: The publisher that emits validation results.
+    ///   - value: The initial value of the field.
     ///   - validator: The validator instance used to apply rules.
     ///   - rules: The validation rules to apply.
+    ///   - debounce: The time to wait after a change before validating. Defaults to no delay.
     public init(
-        value: FormValidatorValueSubject<T>,
-        publisher: ValidationPublisher,
-        validator: IValidator,
-        rules: [any IValidationRule<T>]
+        value: Value,
+        validator: IValidator = Validator(),
+        rules: [any IValidationRule<Value>],
+        debounce: TimeInterval = .zero
     ) {
         self.value = value
-        self.publisher = publisher
         self.validator = validator
         self.rules = rules
+        self.debounce = debounce
+
+        observeValue()
     }
 
     // MARK: IFormValidationContainer
@@ -53,6 +72,40 @@ public struct FormValidationContainter<T>: IFormValidationContainer {
     ///
     /// - Returns: The `ValidationResult` of the validation.
     public func validate() -> ValidationResult {
-        validator.validate(input: value.value, rules: rules)
+        validator.validate(input: value, rules: rules)
+    }
+
+    // MARK: Private
+
+    /// Re-validates the value whenever it changes.
+    ///
+    /// `withObservationTracking` reports a single change, so the observation is re-armed after every
+    /// notification. The callback is delivered before the new value is stored, hence the hop onto a
+    /// task, which also guarantees validation runs against the value the user actually ended up with.
+    private func observeValue() {
+        withObservationTracking {
+            _ = value
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                self?.scheduleValidation()
+                self?.observeValue()
+            }
+        }
+    }
+
+    /// Schedules validation of the current value, cancelling any validation that has not run yet.
+    private func scheduleValidation() {
+        validationTask?.cancel()
+        validationTask = Task { [weak self] in
+            guard let self else { return }
+
+            if debounce > .zero {
+                try? await Task.sleep(for: .seconds(debounce))
+            }
+
+            guard !Task.isCancelled else { return }
+
+            validationResult = validate()
+        }
     }
 }

@@ -68,7 +68,7 @@ import ValidatorUI
 import ValidatorCore
 
 struct LoginView: View {
-    @State private var email = ""
+    @State var email = ""
     
     var body: some View {
         TextField("Email", text: $email)
@@ -90,7 +90,7 @@ For more control over error display, you can use `.validate()` with a custom vie
 
 ```swift
 struct LoginView: View {
-    @State private var password = ""
+    @State var password = ""
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -119,13 +119,13 @@ Tips for SwiftUI:
 For larger forms with multiple fields, ``FormFieldManager`` helps manage all validations in one place. It tracks the state of each field and allows you to check overall form validity.
 
 ```swift
-import Combine
 import SwiftUI
 import ValidatorUI
 import ValidatorCore
 
-class RegistrationForm: ObservableObject {
-    @Published var manager = FormFieldManager()
+@MainActor
+final class RegistrationForm {
+    let manager = FormFieldManager()
     
     @FormField(rules: [
         LengthValidationRule(min: 2, max: 50, error: "Invalid name length")
@@ -151,8 +151,7 @@ class RegistrationForm: ObservableObject {
 }
 
 struct RegistrationView: View {
-    @StateObject private var form = RegistrationForm()
-    @State private var isFormValid = false
+    @State var form = RegistrationForm()
 
     var body: some View {
         Form {
@@ -179,11 +178,8 @@ struct RegistrationView: View {
                 Button("Submit") {
                     form.manager.validate()
                 }
-                .disabled(!isFormValid)
+                .disabled(!form.manager.isValid)
             }
-        }
-        .onReceive(form.manager.$isValid) { newValue in
-            isFormValid = newValue
         }
     }
     
@@ -195,9 +191,11 @@ struct RegistrationView: View {
 
 Form Validation Notes:
 - Use ``FormField`` property wrapper to declare each field with its rules.
-- ``FormFieldManager`` tracks all fields and exposes $isValid for reactive UI updates.
+- ``FormFieldManager`` tracks all fields and exposes an observable `isValid` for reactive UI updates.
 - Validation containers allow you to render errors inline or in custom views.
 - Submitting the form should trigger `manager.validate()` to ensure all fields are checked.
+- The form stack is built on `Observation`, so the same code runs on Apple platforms and on Android
+  via Skip. It requires iOS 17 / macOS 14 / tvOS 17 / watchOS 10 or later.
 
 ## Summary
 

@@ -3,7 +3,8 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import SwiftUI
+// SkipFuseUI re-exports SwiftUI on Apple platforms and SkipSwiftUI on Android.
+import SkipFuseUI
 import ValidatorCore
 
 public extension View {

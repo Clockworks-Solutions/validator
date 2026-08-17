@@ -15,7 +15,7 @@ public protocol IValidator {
     ///   - rule: The validation rule.
     ///
     /// - Returns: A validation result.
-    func validate<T>(input: T, rule: some IValidationRule<T>) -> ValidationResult
+    func validate<T, E:Error>(input: T, rule: some IValidationRule<T, E>) -> ValidationResult
 
     /// Validates an input value.
     ///
@@ -24,5 +24,5 @@ public protocol IValidator {
     ///   - rules: The validation rules array.
     ///
     /// - Returns: A validation result.
-    func validate<T>(input: T, rules: [any IValidationRule<T>]) -> ValidationResult
+    func validate<T, E:Error>(input: T, rules: [any IValidationRule<T, E>]) -> ValidationResult
 }

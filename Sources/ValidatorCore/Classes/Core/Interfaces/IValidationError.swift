@@ -16,13 +16,13 @@ import Foundation
 ///     var message: String { "Invalid input" }
 /// }
 /// ```
-public protocol IValidationError: LocalizedError {
-    /// A human-readable error message describing why validation failed.
-    var message: String { get }
-}
-
-public extension IValidationError {
-    var errorDescription: String? {
-        message
-    }
-}
+//public protocol IValidationError: LocalizedError {
+//    /// A human-readable error message describing why validation failed.
+//    var message: String { get }
+//}
+//
+//public extension IValidationError {
+//    var errorDescription: String? {
+//        message
+//    }
+//}

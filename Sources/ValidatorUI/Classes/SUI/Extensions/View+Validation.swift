@@ -3,10 +3,9 @@
 // Copyright © 2023 Space Code. All rights reserved.
 //
 
-import SwiftUI
+import SkipFuseUI
 import ValidatorCore
 
-// swiftlint:disable:next prefixed_toplevel_constant
 private let validator = Validator()
 
 public extension View {
