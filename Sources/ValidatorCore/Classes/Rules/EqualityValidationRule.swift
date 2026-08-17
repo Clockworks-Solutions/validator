@@ -35,7 +35,7 @@ public struct EqualityValidationRule<T: Equatable>: IValidationRule {
     /// - Parameters:
     ///   - value: The value to compare the input against.
     ///   - error: The validation error to return if validation fails.
-    public init(compareTo value: T, error: IValidationError) {
+    public init(equalTo value: T, error: IValidationError) {
         self.value = value
         self.error = error
     }
@@ -44,5 +44,13 @@ public struct EqualityValidationRule<T: Equatable>: IValidationRule {
 
     public func validate(input: T) -> Bool {
         value == input
+    }
+}
+
+// MARK: - IValidationRule: ComparisonValidationRule
+public extension IValidationRule {
+    @inlinable @inline(always)
+    static func equal<E: Equatable>(to value: E, error: IValidationError) -> Self where Self == EqualityValidationRule<E> {
+        .init(equalTo: value, error: error)
     }
 }

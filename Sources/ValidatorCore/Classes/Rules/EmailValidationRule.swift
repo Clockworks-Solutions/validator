@@ -47,3 +47,11 @@ public struct EmailValidationRule: IValidationRule {
         return false
     }
 }
+
+// MARK: - IValidationRule: EmailValidationRule
+
+public extension IValidationRule where Self == EmailValidationRule {
+    @inlinable @inline(always) static func emailAddress(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}

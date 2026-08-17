@@ -28,3 +28,12 @@ public struct NilValidationRule<T>: IValidationRule {
         input == nil
     }
 }
+
+// MARK: - IValidationRule: NilValidationRule
+
+public extension IValidationRule {
+    @inlinable @inline(always)
+    static func isNil<T>(error: IValidationError) -> Self where Self == NilValidationRule<T> {
+        .init(error: error)
+    }
+}

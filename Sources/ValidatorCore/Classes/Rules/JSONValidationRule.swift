@@ -69,3 +69,11 @@ public struct JSONValidationRule: IValidationRule {
         return true
     }
 }
+
+// MARK: - IValidationRule: JSONValidationRule
+
+public extension IValidationRule where Self == JSONValidationRule {
+    @inlinable @inline(always) static func json(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}

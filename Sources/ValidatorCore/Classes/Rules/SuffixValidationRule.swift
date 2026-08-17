@@ -44,3 +44,10 @@ public struct SuffixValidationRule: IValidationRule {
         input.hasSuffix(suffix)
     }
 }
+
+// MARK: - IValidationRule: SuffixValidationRule
+public extension IValidationRule where Self == SuffixValidationRule {
+    @inlinable @inline(always) static func suffix(_ suffix: Input, error: IValidationError) -> Self {
+        .init(suffix: suffix, error: error)
+    }
+}

@@ -44,3 +44,11 @@ public struct CharactersValidationRule: IValidationRule {
         input.rangeOfCharacter(from: characterSet.inverted) == .none
     }
 }
+
+// MARK: - IValidationRule: CharactersValidationRule
+
+public extension IValidationRule where Self == CharactersValidationRule {
+    @inlinable @inline(always) static func character(set: CharacterSet, error: IValidationError) -> Self {
+        .init(characterSet: set, error: error)
+    }
+}

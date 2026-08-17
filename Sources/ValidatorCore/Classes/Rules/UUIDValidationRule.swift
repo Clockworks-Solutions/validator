@@ -38,3 +38,11 @@ public struct UUIDValidationRule: IValidationRule {
         UUID(uuidString: input) != nil
     }
 }
+
+// MARK: - IValidationRule: UUIDValidationRule
+public extension IValidationRule where Self == UUIDValidationRule {
+    @inlinable @inline(always) static func uuid(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}
+

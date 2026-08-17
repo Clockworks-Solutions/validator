@@ -50,3 +50,11 @@ public struct Base64ValidationRule: IValidationRule {
         return cleanedInput.wholeMatch(of: base64Pattern) != nil
     }
 }
+
+// MARK: - IValidationRule: Base64ValidationRule
+
+public extension IValidationRule where Self == Base64ValidationRule {
+    @inlinable @inline(always) static func base64(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}

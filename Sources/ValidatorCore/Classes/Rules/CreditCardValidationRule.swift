@@ -99,3 +99,11 @@ public struct CreditCardValidationRule: IValidationRule {
         return sum.isMultiple(of: 10)
     }
 }
+// MARK: - IValidationRule: CreditCardValidationRule
+
+public extension IValidationRule where Self == CreditCardValidationRule {
+    @inlinable @inline(always) static func creditCard(types: [CreditCardValidationRule.CardType] = CreditCardValidationRule.CardType.allCases, error: IValidationError) -> Self {
+        .init(types: types, error: error)
+    }
+}
+

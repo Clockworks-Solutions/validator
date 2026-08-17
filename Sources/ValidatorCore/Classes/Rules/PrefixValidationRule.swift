@@ -44,3 +44,11 @@ public struct PrefixValidationRule: IValidationRule {
         input.hasPrefix(prefix)
     }
 }
+
+// MARK: - IValidationRule: PrefixValidationRule
+public extension IValidationRule where Self == PrefixValidationRule {
+    @inlinable @inline(always) static func prefix(_ prefixValue: Input, error: IValidationError) -> Self {
+        .init(prefix: prefixValue, error: error)
+    }
+}
+

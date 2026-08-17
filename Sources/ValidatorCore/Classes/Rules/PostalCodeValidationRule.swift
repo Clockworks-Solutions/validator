@@ -216,3 +216,11 @@ public struct PostalCodeValidationRule: IValidationRule {
     }
     // swiftlint:enable function_body_length cyclomatic_complexity
 }
+
+// MARK: - IValidationRule: PostalCodeValidationRule
+
+public extension IValidationRule where Self == PostalCodeValidationRule {
+    @inlinable @inline(always) static func postalCode(country: PostalCodeValidationRule.Country, error: IValidationError) -> Self {
+        .init(country: country, error: error)
+    }
+}

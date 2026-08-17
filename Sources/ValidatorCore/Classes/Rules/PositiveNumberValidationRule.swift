@@ -33,3 +33,11 @@ public struct PositiveNumberValidationRule: IValidationRule {
         input > 0
     }
 }
+
+// MARK: - IValidationRule: PositiveNumberValidationRule
+
+public extension IValidationRule where Self == PositiveNumberValidationRule {
+    @inlinable @inline(always) static func positiveNumber(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}

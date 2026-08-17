@@ -53,3 +53,11 @@ public struct LengthValidationRule: IValidationRule {
         return length >= min && length <= max
     }
 }
+
+// MARK: - IValidationRule: LengthValidationRule
+
+public extension IValidationRule where Self == LengthValidationRule {
+    @inlinable @inline(always) static func length(min: Int = .zero, max: Int = .max, error: IValidationError) -> Self {
+        .init(min: min, max: max, error: error)
+    }
+}

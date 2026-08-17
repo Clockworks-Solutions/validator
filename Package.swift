@@ -26,7 +26,7 @@ let package = Package(
         .target(
             name: "ValidatorCore",
             dependencies: [.product(name: "SkipFuse", package: "skip-fuse")],
-            plugins: [Target.PluginUsage.plugin(name: "skipstone", package: "skip")]
+            plugins: [.plugin(name: "skipstone", package: "skip")]
         ),
         .target(
             name: "ValidatorUI",
@@ -34,7 +34,7 @@ let package = Package(
                 "ValidatorCore",
                 .product(name: "SkipFuseUI", package: "skip-fuse-ui"),
             ],
-            plugins: [Target.PluginUsage.plugin(name: "skipstone", package: "skip")]
+            plugins: [.plugin(name: "skipstone", package: "skip")]
         ),
         .testTarget(name: "ValidatorCoreTests", dependencies: ["ValidatorCore"]),
         .testTarget(name: "ValidatorUITests", dependencies: ["ValidatorCore", "ValidatorUI"]),

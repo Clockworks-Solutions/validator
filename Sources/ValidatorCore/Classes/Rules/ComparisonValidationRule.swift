@@ -89,3 +89,27 @@ public struct ComparisonValidationRule<T: Comparable>: IValidationRule {
         }
     }
 }
+// MARK: - IValidationRule: ComparisonValidationRule
+
+public extension IValidationRule {
+    @inlinable @inline(always)
+    static func compare<C: Comparable>(_ condition: ComparisonValidationRule<C>.Condition, error: IValidationError) -> Self where Self == ComparisonValidationRule<C> {
+        .init(condition: condition, error: error)
+    }
+    @inlinable @inline(always)
+    static func lessThan<C: Comparable>(_ value: C, error: IValidationError) -> Self where Self == ComparisonValidationRule<C> {
+        .init(condition: .lessThan(value), error: error)
+    }
+    @inlinable @inline(always)
+    static func lessThanOrEqual<C: Comparable>(_ value: C, error: IValidationError) -> Self where Self == ComparisonValidationRule<C> {
+        .init(condition: .lessThanOrEqual(value), error: error)
+    }
+    @inlinable @inline(always)
+    static func greaterThan<C: Comparable>(_ value: C, error: IValidationError) -> Self where Self == ComparisonValidationRule<C> {
+        .init(condition: .greaterThan(value), error: error)
+    }
+    @inlinable @inline(always)
+    static func greaterThanOrEqual<C: Comparable>(_ value: C, error: IValidationError) -> Self where Self == ComparisonValidationRule<C> {
+        .init(condition: .greaterThanOrEqual(value), error: error)
+    }
+}

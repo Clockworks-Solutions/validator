@@ -39,3 +39,11 @@ public struct URLValidationRule: IValidationRule {
         return url.isFileURL || (url.host != nil && url.scheme != nil)
     }
 }
+
+// MARK: - IValidationRule: URLValidationRule
+public extension IValidationRule where Self == URLValidationRule {
+    @inlinable @inline(always) static func url(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}
+

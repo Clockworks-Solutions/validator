@@ -3,6 +3,8 @@
 // Copyright © 2025 Space Code. All rights reserved.
 //
 
+// SkipFuse re-exports the platform C library that provides `sockaddr_in6` / `inet_pton`:
+// `Darwin` on Apple platforms, `Android` on Android.
 import Foundation
 import SkipFuse
 
@@ -124,5 +126,12 @@ public struct IPAddressValidationRule: IValidationRule {
         return input.withCString { cString in
             inet_pton(AF_INET6, cString, &addr.sin6_addr) == 1
         }
+    }
+}
+// MARK: - IValidationRule: IPAddressValidationRule
+
+public extension IValidationRule where Self == IPAddressValidationRule {
+    @inlinable @inline(always) static func ipAddress(version: IPAddressValidationRule.Version, error: IValidationError) -> Self {
+        .init(version: version, error: error)
     }
 }

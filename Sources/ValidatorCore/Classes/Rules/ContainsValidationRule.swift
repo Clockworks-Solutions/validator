@@ -41,3 +41,11 @@ public struct ContainsValidationRule: IValidationRule {
         input.contains(substring)
     }
 }
+
+// MARK: - IValidationRule: ContainsValidationRule
+
+public extension IValidationRule where Self == ContainsValidationRule {
+    @inlinable @inline(always) static func contains(substring: String, error: IValidationError) -> Self {
+        .init(substring: substring, error: error)
+    }
+}

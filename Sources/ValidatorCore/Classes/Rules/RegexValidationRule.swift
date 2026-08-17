@@ -48,3 +48,10 @@ public struct RegexValidationRule: IValidationRule {
         return false
     }
 }
+
+// MARK: - IValidationRule: PrefixValidationRule
+public extension IValidationRule where Self == RegexValidationRule {
+    @inlinable @inline(always) static func regex(pattern: String, error: IValidationError) -> Self {
+        .init(pattern: pattern, error: error)
+    }
+}

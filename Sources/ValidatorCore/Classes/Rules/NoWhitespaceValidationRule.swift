@@ -37,3 +37,10 @@ public struct NoWhitespaceValidationRule: IValidationRule {
         input.rangeOfCharacter(from: .whitespacesAndNewlines) == nil
     }
 }
+// MARK: - IValidationRule: NoWhitespaceValidationRule
+
+public extension IValidationRule where Self == NoWhitespaceValidationRule {
+    @inlinable @inline(always) static func noWhiteSpace(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}

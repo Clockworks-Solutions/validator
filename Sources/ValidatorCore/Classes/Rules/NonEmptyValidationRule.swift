@@ -35,3 +35,12 @@ public struct NonEmptyValidationRule: IValidationRule {
         !input.isEmpty
     }
 }
+
+// MARK: - IValidationRule: NonEmptyValidationRule
+
+public extension IValidationRule where Self == NonEmptyValidationRule {
+    @inlinable @inline(always) static func nonEmpty(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}
+

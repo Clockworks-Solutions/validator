@@ -69,3 +69,11 @@ public struct IBANValidationRule: IValidationRule {
         return remainder == 1
     }
 }
+
+// MARK: - IValidationRule: IBANValidationRule
+
+public extension IValidationRule where Self == IBANValidationRule {
+    @inlinable @inline(always) static func iBan(error: IValidationError) -> Self {
+        .init(error: error)
+    }
+}
