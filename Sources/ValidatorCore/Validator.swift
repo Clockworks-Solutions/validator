@@ -46,7 +46,7 @@ extension Validator: IValidator {
     ///   - rule: A single validation rule conforming to `IValidationRule`.
     ///
     /// - Returns: A `ValidationResult` indicating `.valid` or `.invalid` with associated errors.
-    public func validate<T>(input: T, rule: some IValidationRule<T>) -> ValidationResult {
+    public func validate<T, E:Error>(input: T, rule: some IValidationRule<T, E>) -> ValidationResult {
         validate(input: input, rules: [rule])
     }
 
@@ -57,7 +57,7 @@ extension Validator: IValidator {
     ///   - rules: An array of validation rules conforming to `IValidationRule`.
     ///
     /// - Returns: A `ValidationResult` indicating `.valid` if all rules pass, or `.invalid` with all errors.
-    public func validate<T>(input: T, rules: [any IValidationRule<T>]) -> ValidationResult {
+    public func validate<T, E:Error>(input: T, rules: [any IValidationRule<T, E>]) -> ValidationResult {
         let errors = rules
             .filter { !self.validate(input: input, rule: $0) }
             .map(\.error)
@@ -65,7 +65,7 @@ extension Validator: IValidator {
         return errors.isEmpty ? .valid : ValidationResult.invalid(errors: errors)
     }
 
-    private func validate<T>(input: T, rule: some IValidationRule<T>) -> Bool {
+    private func validate<T, E:Error>(input: T, rule: some IValidationRule<T, E>) -> Bool {
         rule.validate(input: input)
     }
 }

@@ -21,7 +21,7 @@ extension ValidationResult: Equatable {
         case (.valid, .valid):
             true
         case let (.invalid(errors: lhsErrors), .invalid(errors: rhsErrors)):
-            lhsErrors.map(\.message).joined() == rhsErrors.map(\.message).joined()
+            lhsErrors.map(\.localizedDescription).joined() == rhsErrors.map(\.localizedDescription).joined()
         default:
             false
         }

@@ -19,12 +19,15 @@ import Foundation
 ///     }
 /// }
 /// ```
-public protocol IValidationRule<Input> {
+public protocol IValidationRule<Input, E> {
     /// The type of input this validator works with.
     associatedtype Input
 
+    /// The error type returned when validation fails.
+    associatedtype E: Error
+
     /// The validation error that will be returned if validation fails.
-    var error: IValidationError { get }
+    var error: E { get }
 
     /// Validates the provided input.
     ///

@@ -20,9 +20,9 @@ import Foundation
 /// let error: IValidationError = "Invalid input"
 /// print(error.message) // "Invalid input"
 /// ```
-extension String: IValidationError {
-    /// Returns the string itself as the error message.
-    public var message: String {
-        self
-    }
-}
+//extension String: Error {
+//    /// Returns the string itself as the error message.
+//    public var message: String {
+//        self
+//    }
+//}

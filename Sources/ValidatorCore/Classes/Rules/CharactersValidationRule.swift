@@ -13,7 +13,7 @@ import Foundation
 /// rule.validate(input: "Hello") // true
 /// rule.validate(input: "Hello123") // false
 /// ```
-public struct CharactersValidationRule: IValidationRule {
+public struct CharactersValidationRule<E:Error>: IValidationRule {
     // MARK: Types
 
     public typealias Input = String
@@ -24,7 +24,7 @@ public struct CharactersValidationRule: IValidationRule {
     public let characterSet: CharacterSet
 
     /// The validation error returned if input contains invalid characters.
-    public let error: IValidationError
+    public let error: E
 
     // MARK: Initialization
 
@@ -33,7 +33,7 @@ public struct CharactersValidationRule: IValidationRule {
     /// - Parameters:
     ///   - characterSet: Allowed character set.
     ///   - error: The validation error to return if input fails validation.
-    public init(characterSet: CharacterSet, error: IValidationError) {
+    public init(characterSet: CharacterSet, error: E) {
         self.characterSet = characterSet
         self.error = error
     }
@@ -47,8 +47,9 @@ public struct CharactersValidationRule: IValidationRule {
 
 // MARK: - IValidationRule: CharactersValidationRule
 
-public extension IValidationRule where Self == CharactersValidationRule {
-    @inlinable @inline(always) static func character(set: CharacterSet, error: IValidationError) -> Self {
+public extension IValidationRule {
+    @inlinable @inline(always)
+    static func character<E:Error>(set: CharacterSet, error: E) -> Self where Self == CharactersValidationRule<E> {
         .init(characterSet: set, error: error)
     }
 }
